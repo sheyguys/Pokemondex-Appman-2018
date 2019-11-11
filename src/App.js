@@ -25,7 +25,7 @@ class App extends Component {
 
   constructor(props) {
     super(props)
-
+    this.saveTomydex = this.saveTomydex.bind(this);
     this.state = {
       modal: false,
       displaystatus: 'none',
@@ -34,17 +34,19 @@ class App extends Component {
     }
   }
 
-  saveTomydex = (id) => {
-    console.log("aaa")
-    console.log(id)
+  saveTomydex = (pokemon) => () => {
+    console.log(pokemon)
+      this.setState({ mydex: [...this.state.mydex, pokemon] })
+
   }
 
   search = (keyword) => {
     console.log(keyword)
     var dexArray = []
-    var url = "http://localhost:3030/api/cards?limit=20&name=" + keyword
+    const url = "http://localhost:3030/api/cards?name=" + keyword
     Axios.get(url).then(result => {
       console.log(JSON.stringify(result.data.cards))
+      console.log(result.data.cards.length)
       result.data.cards.forEach(dex => {
         dexArray.push(dex)
       })
@@ -61,6 +63,7 @@ class App extends Component {
   }
 
   closedisplay = (el) => {
+    
     // this.setState({ displaystatus: 'none' })
     // el !== this.refs.xx
     console.log(el)
@@ -74,11 +77,15 @@ class App extends Component {
             <div class="header">
               <div>
                 <center>
-                  <h1 class="header">My Pokedex</h1>
+                  <h1>My Pokedex</h1>
                 </center>
               </div>
               <div class="my-dex">
-
+                {this.state.mydex.map((res) => (
+                  <div key={res.id}>
+                    <img src={res.imageUrl}/>                  
+                  </div>
+                ))}
               </div>
             </div>
             <div>
@@ -88,7 +95,7 @@ class App extends Component {
                 </div>
               </div>
             </div>
-            <div class="boxOverray" style={{ display: this.state.displaystatus }}>
+            <div class="boxOverray" style={{ display: this.state.displaystatus }} id="modal" onClick={this.closedisplay}>
               <div class="boxModal" style={{ display: this.state.displaystatus }} >
                 <div class="headermodal">
                   <div class="box-input">
@@ -101,8 +108,8 @@ class App extends Component {
                 <br />
                 <div class="boxDex">
                   {this.state.dexphoto.map((res) => (
-                    <div class="empty">
-                      <div class="container" key={res.id}>
+                    <div class="empty" key={res.id}>
+                      <div class="container" >
                         <div class="box" id="box1">
                           <img src={res.imageUrl} alt="logo" />
                         </div>
@@ -116,15 +123,15 @@ class App extends Component {
                               <div class="power-line">
                                 <div class="line">HP</div>
                                 <div class="progress-bar">
-                                  <div class="value-progress-bar" style={{ width: (res.hp >= 100) ? '100' : (res.hp === 'None') ? '0' : res.hp + '%' }}>{res.hp}</div>
+                                  <div class="value-progress-bar" style={{ width: (res.hp >= 100) ? '100' : (res.hp === 'None') ? '0' : (!res.hp) ? '0' : res.hp + '%' }}>{res.hp}</div>
                                 </div>
                                 <div class="line">STR</div>
                                 <div class="progress-bar">
-                                  <div class="value-progress-bar" ></div>
+                                  <div class="value-progress-bar" style={{ width: (res.attacks ? res.attacks.length:0)*50 + '%'}}>{res.attacks ? res.attacks.length : 0}</div>
                                 </div>
                                 <div class="line">WEAK</div>
                                 <div class="progress-bar">
-                                  <div class="value-progress-bar" style={{ width: res.damage }}>{res.damage}</div>
+                                  <div class="value-progress-bar" style={{ width: (res.weaknesses ? res.weaknesses.length:0)*100 + '%'}}>{res.weaknesses ? res.weaknesses.length : 0}</div>
                                 </div>
                               </div>
                             </div>
@@ -134,13 +141,14 @@ class App extends Component {
                             <img class="cute-img" src={cute} alt="emotion" />
                             <img class="cute-img" src={cute} alt="emotion" />
                             <img class="cute-img" src={cute} alt="emotion" />
+                            <img class="cute-img" src={cute} alt="emotion" />
+                            <img class="cute-img" src={cute} alt="emotion" />
                           </div>
                         </div>
-                        <div class="box" id="box3">
+                        <div class="box" id="box3" onClick={this.saveTomydex(res)}>
                           <h1>Add</h1>
                         </div>
                       </div>
-                      <br />
                     </div>
                   ))}
                 </div>

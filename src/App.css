@@ -14,7 +14,12 @@
 
 .my-dex {
     z-index: 0;
-    background-color: aqua;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    float: left;
+    height: 160px;
+    width: 500px;
 }
 
 .footer {
@@ -138,14 +143,14 @@
 /*Progress Bar*/
 
 .progress-bar {
-    width: 300px;
+    width: 350px;
     background-color: #aeaeae;
     border-radius: 50px;
 }
 
 .value-progress-bar {
     display: block;
-    height: 25px;
+    height: 30px;
     background-color: #f3701a;
     border-radius: 30px;
 }
