@@ -1,156 +1,209 @@
 /* Ipad Screen */
 
 .App {
-    width: 1024px;
-    height: 768px;
+  width: 1024px;
+  height: 768px;
+  z-index: 0;
 }
 
 .header {
-    z-index: 0;
-    position: absolute;
-    width: 100%;
-    top:0;
+  z-index: 1;
+  position: absolute;
+  width: 100%;
+  top: 0;
 }
 
 .my-dex {
-    z-index: 0;
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    float: left;
-    height: 160px;
-    width: 500px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  display: grid;
+  grid-template-columns: 512px 512px;
+  position: relative;
+  float: left;
+  height: 600px;
+  width: 1024px;
+  z-index: 01;
 }
 
 .footer {
-    height: 8%;
-    background-color: #ec5656;
-    bottom: 0;
-    position: absolute;
-    width: 100%;
-    z-index: 0;
+  height: 8%;
+  background-color: #ec5656;
+  bottom: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 2;
 }
 
 .circlecontainer {
-    display: table;
-    margin: auto;
-    position: relative;
-    top: -50px;
+  display: table;
+  margin: auto;
+  position: relative;
+  top: -50px;
+  cursor: pointer;
 }
 
 .circle {
-    width: 100px;
-    height: 100px;
-    border: solid 5px #ec5656;
-    background-color: #ec5656;
-    color: white;
-    border-radius: 100px;
-    font-size: 68px;
-    text-align: center;
+  width: 100px;
+  height: 100px;
+  border: solid 5px #ec5656;
+  background-color: #ec5656;
+  color: white;
+  border-radius: 100px;
+  font-size: 68px;
+  text-align: center;
 }
 
 /* In Modal */
 
 .boxOverray {
-    height: 768px;
-    width: 1024px;
-    background-color: #000000a3;
-    margin: auto;
-    float: left ; 
-    margin: auto;
+  position: absolute;
+  height: 768px;
+  width: 1024px;
+  background-color: #000000a3;
+  margin: auto;
+  float: left;
+  z-index: 100;
 }
 
 .boxModal {
-    flex-direction: column;
-    background-color: #ffffff;
-    height: 400px;
-    width: 900px;
-    margin: auto;
-    z-index: 15;
+  background-color: #ffffff;
+  height: 680px;
+  width: 900px;
+  margin: auto;
+  z-index: 100;
 }
 
 .boxDex {
-    height: 450px;
-    width: 900px;
-    overflow-y: scroll;
-    overflow-x: hidden;
+  height: 600px;
+  width: 900px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+/*-----------------------------(Change Scroll Bar)-----------------------------*/
+#style-1::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+	background-color: #F5F5F5;
+}
+
+#style-1::-webkit-scrollbar
+{
+	width: 10px;
+	background-color: #F5F5F5;
+}
+
+#style-1::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #555;
+}
+/*-----------------------------(Change Scroll Bar)-----------------------------*/
+
+.line {
+  font-size: 24px;
 }
 
 .input {
-    position: sticky;
-    display: block;
-    padding-left: 8px;
-    width: 100%;
-    font-family: 'Atma', cursive;
-    font-size: 35px;
-    flex-direction: row;
+  position: sticky;
+  display: block;
+  padding-left: 8px;
+  width: 100%;
+  font-family: Atma;
+  font-size: 35px;
+  flex-direction: row;
 }
 
 .box-input {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 
 .box-search {
-    position: absolute;
-    right: 60px;
+  position: absolute;
+  right: 60px;
 }
 
 .search-img {
-    width: 60px;
-    height: 60px;
+  width: 60px;
+  height: 60px;
 }
 
-.box-happiness {
-    display: flex;
+.box-Happiness {
+  display: flex;
 }
 
 .cute-img {
-    margin: 1px;
-    width: 60px;
-    height: 60px;
+  margin: 1px;
+  width: 60px;
+  height: 60px;
 }
 
 .container {
-    display: flex;
-    flex-direction: row;
-    background-color: #f3f4f7;
-    width: 100%;
-    padding: 5px;
+  display: flex;
+  flex-direction: row;
+  background-color: #d5d6dc;
+  width: 100%;
+  margin: 8px;
 }
 
 #box1 {
-    flex-grow: 1;
+  flex-grow: 1;
 }
 
 #box2 {
-    flex-grow: 8;
-    display: flex;
-    flex-direction: column;
+  flex-grow: 8;
+  display: flex;
+  flex-direction: column;
 }
 
 #box3 {
-    flex-grow: 1;
-    color: #ec5656;
-    text-align: center;
+  flex-grow: 1;
+  color: #ec5656;
+  text-align: center;
 }
 
 .box-powerbar {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 
 /*Progress Bar*/
 
 .progress-bar {
-    width: 350px;
-    background-color: #aeaeae;
-    border-radius: 50px;
+  width: 220px;
+  background-color: #aeaeae;
+  border-radius: 50px;
 }
 
 .value-progress-bar {
-    display: block;
-    height: 30px;
-    background-color: #f3701a;
-    border-radius: 30px;
+  display: block;
+  height: 30px;
+  background-color: #f3701a;
+  border-radius: 30px;
+}
+
+.box-mycard {
+  display: grid;
+  grid-template-columns: 220px 240px 40px;
+  background-color: #d5d6dc;
+  margin: 5px;
+  z-index: 0;
+}
+
+.my-dex-power {
+  margin-left: 30px;
+  z-index: 1;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.close{
+  cursor: pointer;
+  text-align: center;
+  font-size: 40px;
+  color: #ec5656;
 }
