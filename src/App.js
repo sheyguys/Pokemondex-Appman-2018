@@ -4,7 +4,7 @@ import cute from "./cute.png";
 import Axios from "axios";
 import Service from "./service.js";
 import Progress from "./Progress.js";
-
+import Happiness from "./Happiness";
 import "./App.css";
 
 const COLORS = {
@@ -21,7 +21,6 @@ const COLORS = {
   Fire: "#eb4d4b"
 };
 
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -29,19 +28,20 @@ class App extends Component {
     this.state = {
       modal: false,
       displaystatus: "none",
+      displayADdBut: "none",
       dexphoto: [],
       mydex: [],
-      Happiness: 0
+      index: 0
     };
     Service.getpokedex().then(res => {
       res.cards.forEach(newRes => {
-        this.state.dexphoto.push(this.checkHappiness(newRes))
-      })
+        this.state.dexphoto.push(this.checkHappiness(newRes));
+      });
       this.setState({ dexphoto: this.state.dexphoto });
     });
   }
   // CAL PROGRESS BAR HP
-  CalHP = (hp) => {
+  CalHP = hp => {
     let thisHp = 0;
     if (!hp || hp === "None") {
       thisHp = 0;
@@ -50,33 +50,40 @@ class App extends Component {
     } else {
       thisHp = hp;
     }
-    return thisHp
-  }
+    return thisHp;
+  };
   // CAL PROGRESS BAR STR
-  CalSTR = (attacks) => {
+  CalSTR = attacks => {
     let thisStr = 0;
     if (attacks && attacks.length !== 0) {
       thisStr = attacks.length * 50;
     }
-    return thisStr
-  }
+    return thisStr;
+  };
   // CAL PROGRESS BAR WEAKNESSES
-  CalWEAK = (weaknesses) => {
+  CalWEAK = weaknesses => {
     let thisWeak = 0;
     if (weaknesses && weaknesses !== 0) {
       thisWeak = weaknesses * 100;
     }
-    return thisWeak
-  }
+    return thisWeak;
+  };
 
-  checkHappiness = (res) => {
-    console.log("Res = " + res)
+  createHappiness = happiness => {
+    let hap = [];
+    for (let i = 0; i < happiness; i++) {
+      hap.push(<img class="cute-img" src={cute} alt="emotion" />);
+    }
+    return hap;
+  };
+  checkHappiness = res => {
+    console.log("Res = " + res);
     console.log("In Check");
     // this.state.mydex.forEach((res, key) => {
     let thisHp = 0;
     let thisAttack = 0;
     let thisWeakness = 0;
-    let thisHappiness
+    let thisHappiness;
     //check hp
     if (!res.hp || res.hp === "None") {
       thisHp = 0;
@@ -101,8 +108,7 @@ class App extends Component {
           } else {
             console.log("ข้างหลังไมใช่เลข" + att.damage);
             thisAttack =
-              thisAttack +
-              parseInt(att.damage.substring(0, att.damage.length));
+              thisAttack + parseInt(att.damage.substring(0, att.damage.length));
           }
         }
       });
@@ -113,9 +119,11 @@ class App extends Component {
       thisWeakness = res.weaknessnes.length * 50;
     }
 
-    //calculate 
+    //calculate
     // ((HP / 10) + (Damage /10 ) + 10 - (Weakness)) / 5
-    thisHappiness = Math.ceil(Math.abs(((thisHp / 10) + (thisAttack / 10) + 10 - (thisWeakness)) / 5))
+    thisHappiness = Math.ceil(
+      Math.abs((thisHp / 10 + thisAttack / 10 + 10 - thisWeakness) / 5)
+    );
     // Object.assign(this.state.dexphoto[key], {"happiness": thisHappiness})
     // this.setState({dexphoto: this.state.dexphoto})
     console.log("This Hp " + thisHp);
@@ -123,16 +131,10 @@ class App extends Component {
     console.log("This Weakness " + thisWeakness);
     // console.log("New tag happiness: " + this.state.dexphoto[key].happiness)
     // });
-    console.log(Object.assign(res, { "happiness": thisHappiness }))
-    return res
-  };
-
-  createHappiness = (happiness) => {
-    let hap = [];
-    for (let i = 0; i < happiness; i++) {
-      hap.push(<img class="cute-img" src={cute} alt="emotion" />);
-    }
-    return hap;
+    console.log(Object.assign(res, { happiness: thisHappiness }));
+    console.log(Object.assign(res, { index: this.state.index }));
+    this.setState({ index: ++this.state.index });
+    return res;
   };
 
   saveTomydex = pokemon => () => {
@@ -153,18 +155,17 @@ class App extends Component {
     var dexArray = [];
     const url = "http://localhost:3030/api/cards?name=" + keyword;
     Axios.get(url).then(result => {
-      console.log(JSON.stringify(result.data.cards));
-      console.log(result.data.cards.length);
       result.data.cards.forEach(dex => {
         if (this.state.mydex.length !== 0) {
-          console.log("First Time");
           this.state.mydex.forEach(myDex => {
             if (dex.id !== myDex.id) {
-              dexArray.push(dex);
+              console.log(dex);
+              dexArray.push(this.checkHappiness(dex));
+              console.log(dexArray);
             }
           });
         } else {
-          dexArray.push(dex);
+          dexArray.push(this.checkHappiness(dex));
         }
       });
       this.setState({ dexphoto: dexArray });
@@ -184,38 +185,65 @@ class App extends Component {
     console.log();
   };
 
-  delformdex = del => () => {
-    console.log(del)
-  }
+  delfromdex = (res, key) => () => {
+    console.log(key);
+    this.state.dexphoto.splice(key, 0, res);
+    this.setState({ dexphoto: this.state.dexphoto });
+    this.state.mydex.splice(key, 1);
+    this.setState({ mydex: this.state.mydex });
+  };
 
+  changeButton = () => {
+    this.setState({ displayADdBut: "block" });
+  };
   render() {
     return (
       <div>
         <div className="App">
           <div className="App-header">
-            <div
-              class="header"
-            >
+            <div class="header">
               <div>
                 <center>
                   <h1>My Pokedex</h1>
                 </center>
               </div>
               <div class="my-dex" id="style-1">
-                {this.state.mydex.map(res => (
+                {this.state.mydex.map((res, key) => (
                   <div key={res.id}>
                     <div class="box-mycard">
                       <div>
-                        <img src={res.imageUrl} />
+                        <img src={res.imageUrl} class="my-img" />
                       </div>
                       <div class="my-dex-power">
-                        <h1>{res.name}
-                        </h1>
-                        <Progress width={this.CalHP(res.hp)}></Progress>
-                        <Progress width={this.CalSTR(res.attacks)}></Progress>
-                        <Progress width={this.CalWEAK(res.weaknesses)}></Progress>
+                        <h1 class="name">{res.name}</h1>
+                        <div class="type">
+                          <div class="text">HP</div>
+                          <div class="tap">
+                            <Progress 
+                            width={this.CalHP(res.hp)}
+                            ></Progress>
+                          </div>
+                          <div class="text">STR</div>
+                          <div class="tap">
+                            <Progress
+                              width={this.CalSTR(res.attacks)}
+                            ></Progress>
+                          </div>
+                          <div class="text">WEAK</div>
+                          <div class="tap">
+                            <Progress
+                              width={this.CalWEAK(res.weaknesses)}
+                            ></Progress>
+                          </div>
+                        </div>
+                        <div class="box-Happiness">
+                          {/* {this.createHappiness(res.happiness)} */}
+                          <Happiness happiness={res.happiness}></Happiness>
+                        </div>
                       </div>
-                      <div class="close" onClick={this.delformdex(res)}>X</div>
+                      <div class="close" onClick={this.delfromdex(res, key)}>
+                        X
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -272,7 +300,7 @@ class App extends Component {
                           <div class="box-powerbar">
                             <div class="box-power">
                               <div class="power-line">
-                                <div class="line">HP</div>
+                                <div class="text">HP</div>
                                 <div class="progress-bar">
                                   <div
                                     class="value-progress-bar"
@@ -281,30 +309,30 @@ class App extends Component {
                                         res.hp >= 100
                                           ? "100"
                                           : res.hp === "None"
-                                            ? "0"
-                                            : !res.hp
-                                              ? "0"
-                                              : res.hp + "%"
+                                          ? "0"
+                                          : !res.hp
+                                          ? "0"
+                                          : res.hp + "%"
                                     }}
                                   >
                                     {res.hp}
                                   </div>
                                 </div>
-                                <div class="line">STR</div>
+                                <div class="text">STR</div>
                                 <div class="progress-bar">
                                   <div
                                     class="value-progress-bar"
                                     style={{
                                       width:
                                         (res.attacks ? res.attacks.length : 0) *
-                                        50 +
+                                          50 +
                                         "%"
                                     }}
                                   >
                                     {res.attacks ? res.attacks.length : 0}
                                   </div>
                                 </div>
-                                <div class="line">WEAK</div>
+                                <div class="text">WEAK</div>
                                 <div class="progress-bar">
                                   <div
                                     class="value-progress-bar"
@@ -313,7 +341,7 @@ class App extends Component {
                                         (res.weaknesses
                                           ? res.weaknesses.length
                                           : 0) *
-                                        100 +
+                                          100 +
                                         "%"
                                     }}
                                   >
@@ -324,17 +352,17 @@ class App extends Component {
                             </div>
                           </div>
                           <br />
-                          <div class="box-Happiness">
+                          <div>
                             {this.createHappiness(res.happiness)}
+                            {/* <Happiness happiness={res.happiness}></Happiness> */}
                           </div>
-                          <br />
                         </div>
                         <div
                           class="box"
                           id="box3"
                           onClick={this.saveTomydex(res)}
                         >
-                          <h1 class="pointer">Add</h1>
+                          <h1 class="pointer isHover">Add</h1>
                         </div>
                       </div>
                     </div>
