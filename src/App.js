@@ -28,18 +28,20 @@ class App extends Component {
     this.state = {
       modal: false,
       displaystatus: "none",
-      displayADdBut: "none",
       dexphoto: [],
       mydex: [],
-      index: 0
+      index: 0,
+      isFirstCheck: true,
+      tempDex: []
     };
     Service.getpokedex().then(res => {
       res.cards.forEach(newRes => {
-        this.state.dexphoto.push(this.checkHappiness(newRes));
+        this.state.tempDex.push(this.checkHappiness(newRes));
       });
-      this.setState({ dexphoto: this.state.dexphoto });
+      this.setState({ tempDex: this.state.tempDex });
     });
   }
+
   // CAL PROGRESS BAR HP
   CalHP = hp => {
     let thisHp = 0;
@@ -140,36 +142,60 @@ class App extends Component {
   saveTomydex = pokemon => () => {
     // console.log(pokemon);
     this.setState({ mydex: [...this.state.mydex, pokemon] });
-    this.state.dexphoto.forEach((res, key) => {
+    this.state.tempDex.forEach((res, key) => {
       // console.log("add in" + key, res);
       if (res.id === pokemon.id) {
-        this.state.dexphoto.splice(key, 1);
-        this.setState({ dexphoto: this.state.dexphoto });
+        this.state.tempDex.splice(key, 1);
+        this.setState({ tempDex: this.state.tempDex });
         // this.checkHappiness();
       }
     });
   };
 
-  search = keyword => {
-    console.log(keyword);
-    var dexArray = [];
-    const url = "http://localhost:3030/api/cards?name=" + keyword;
-    Axios.get(url).then(result => {
-      result.data.cards.forEach(dex => {
-        if (this.state.mydex.length !== 0) {
-          this.state.mydex.forEach(myDex => {
-            if (dex.id !== myDex.id) {
-              console.log(dex);
-              dexArray.push(this.checkHappiness(dex));
-              console.log(dexArray);
-            }
-          });
-        } else {
-          dexArray.push(this.checkHappiness(dex));
-        }
+  search = async keyword => {
+    //ทำงานแบบ async ทำให้เสร็จก่อยแล้วค่อยไปทำ await
+    console.log("Indexphoto" + keyword);
+    this.state.tempDex.splice(0, this.state.tempDex.length); // set 0 Evertime search
+    this.setState({ tempDex: this.state.tempDex }); // Save null
+    // console.log("this length of temp " + this.state.tempDex.length);
+    if (this.state.isFirstCheck) {
+      // +80 From 100
+      var temp = [];
+      // console.log("First search");
+      this.setState({ isFirstCheck: false });
+      const url = "http://localhost:3030/api/cards?name=";
+      await Axios.get(url).then(result => {
+        result.data.cards.forEach(dex => {
+          temp.push(this.checkHappiness(dex));
+        });
+        this.setState({ dexphoto: temp });
       });
-      this.setState({ dexphoto: dexArray });
+    }
+    // search
+    this.state.dexphoto.forEach(dex => {
+      var isFound = false; //is found on mydex
+      // console.log("Indexphoto" + keyword)
+      if (this.state.mydex.length !== 0) {
+        //check mydex is empty
+        this.state.mydex.forEach(mydex => {
+          if (dex.name.includes(keyword) && mydex.name === dex.name) {
+            console.log("Include" + dex.name + mydex.name);
+            isFound = true; // my dex have is card
+          }
+        });
+        if (!isFound && dex.name.includes(keyword)) {
+          console.log("Pushing");
+          this.state.tempDex.push(dex);
+          this.setState({ tempDex: this.state.tempDex });
+        }
+      } else {
+        if (dex.name.includes(keyword)) {
+          this.state.tempDex.push(dex);
+        }
+        this.setState({ tempDex: this.state.tempDex });
+      }
     });
+    console.log("length of dexphoto" + this.state.dexphoto.length);
   };
 
   toggle = () => {
@@ -182,20 +208,16 @@ class App extends Component {
     if (e.target === modal) {
       this.setState({ displaystatus: "none" });
     }
-    console.log();
   };
 
   delfromdex = (res, key) => () => {
     console.log(key);
-    this.state.dexphoto.splice(key, 0, res);
-    this.setState({ dexphoto: this.state.dexphoto });
+    this.state.tempDex.splice(key, 0, res);
+    this.setState({ tempDex: this.state.tempDex });
     this.state.mydex.splice(key, 1);
     this.setState({ mydex: this.state.mydex });
   };
 
-  changeButton = () => {
-    this.setState({ displayADdBut: "block" });
-  };
   render() {
     return (
       <div>
@@ -219,9 +241,7 @@ class App extends Component {
                         <div class="type">
                           <div class="text">HP</div>
                           <div class="tap">
-                            <Progress 
-                            width={this.CalHP(res.hp)}
-                            ></Progress>
+                            <Progress width={this.CalHP(res.hp)}></Progress>
                           </div>
                           <div class="text">STR</div>
                           <div class="tap">
@@ -286,7 +306,7 @@ class App extends Component {
                   </div>
                 </div>
                 <div class="boxDex" id="style-1">
-                  {this.state.dexphoto.map(res => (
+                  {this.state.tempDex.map(res => (
                     <div class="empty" key={res.id}>
                       <div class="container">
                         <div class="box" id="box1">
@@ -295,7 +315,7 @@ class App extends Component {
                         <br />
                         <div class="box" id="box2">
                           <div class="pokemonname">
-                            <h1>{res.name}</h1>
+                            <h1 class="name">{res.name}</h1>
                           </div>
                           <div class="box-powerbar">
                             <div class="box-power">
@@ -315,7 +335,7 @@ class App extends Component {
                                           : res.hp + "%"
                                     }}
                                   >
-                                    {res.hp}
+                                    {/* {res.hp} */}
                                   </div>
                                 </div>
                                 <div class="text">STR</div>
@@ -329,7 +349,7 @@ class App extends Component {
                                         "%"
                                     }}
                                   >
-                                    {res.attacks ? res.attacks.length : 0}
+                                    {/* {res.attacks ? res.attacks.length : 0} */}
                                   </div>
                                 </div>
                                 <div class="text">WEAK</div>
@@ -345,7 +365,7 @@ class App extends Component {
                                         "%"
                                     }}
                                   >
-                                    {res.weaknesses ? res.weaknesses.length : 0}
+                                    {/* {res.weaknesses ? res.weaknesses.length : 0} */}
                                   </div>
                                 </div>
                               </div>
